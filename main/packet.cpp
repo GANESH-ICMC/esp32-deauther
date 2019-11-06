@@ -107,11 +107,6 @@ esp_err_t PacketSender::deauth(const MacAddr ap, const MacAddr station,
     if(res != ESP_OK) return res;
     
     memcpy(buffer, deauthPacket, sizeof(deauthPacket));
-    printf("DEAUTH -> %02X:%02X:%02X:%02X:%02X:%02X\n",
-            ap[0], ap[1], ap[2], ap[3], ap[4], ap[5]);
-    printf("       -> %02X:%02X:%02X:%02X:%02X:%02X\n",
-            station[0], station[1], station[2], station[3],
-            station[4], station[5]);
 
     memcpy(&buffer[4], ap, 6);
     memcpy(&buffer[10], station, 6);
@@ -121,10 +116,10 @@ esp_err_t PacketSender::deauth(const MacAddr ap, const MacAddr station,
 
     seqnum++;
 
-    res = esp_wifi_80211_tx(WIFI_IF_AP, buffer, sizeof(deauthPacket), false);
+    res = raw(buffer, sizeof(deauthPacket));
     if(res == ESP_OK) return ESP_OK;
     buffer[0] = 0xa0;
-    return esp_wifi_80211_tx(WIFI_IF_AP, buffer, sizeof(deauthPacket), false);
+    return raw(buffer, sizeof(deauthPacket));
 }
 
 esp_err_t PacketSender::beacon(const MacAddr mac, const char* ssid,
@@ -152,7 +147,7 @@ esp_err_t PacketSender::beacon(const MacAddr mac, const char* ssid,
     memcpy(&buffer[38 + ssidLen], &beaconPacket[70], wpa2 ? 39 : 13);
 
     seqnum++;
-    return esp_wifi_80211_tx(WIFI_IF_AP, buffer, packetSize, false);
+    return raw(buffer, packetSize);
 }
 
 esp_err_t PacketSender::probe(const MacAddr mac, const char* ssid,
@@ -165,7 +160,11 @@ esp_err_t PacketSender::probe(const MacAddr mac, const char* ssid,
     memcpy(&buffer[10], mac, 6);
     memcpy(&buffer[26], ssid, strlen(ssid));
 
-    return esp_wifi_80211_tx(WIFI_IF_AP, buffer, sizeof(probePacket), false);
+    return raw(buffer, sizeof(probePacket));
+}
+
+esp_err_t PacketSender::raw(const uint8_t* packet, int32_t len, bool en_sys_seq) {
+    return esp_wifi_80211_tx(WIFI_IF_AP, packet, len, en_sys_seq);
 }
 
 esp_err_t PacketSender::change_channel(uint8_t channel) {
