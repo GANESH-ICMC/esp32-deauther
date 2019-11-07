@@ -5,6 +5,9 @@ based on the `esp_wifi_80211_tx` function described in https://github.com/Jeija/
 
 # Building
 
+Install [esp-idf](https://github.com/espressif/esp-idf). This project is built and tested with
+commit a45e9985344575a80acb1dc9c12e7bec4d8af401.
+
 `idf.py build`
 
 Built with v4.1-dev-763-ga45e99853
