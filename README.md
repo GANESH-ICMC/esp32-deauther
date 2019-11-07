@@ -1,6 +1,6 @@
 # ESP32 Deauther
 
-(Maybe) Port of https://github.com/spacehuhn/esp8266\_deauther to the ESP32,
+(Maybe) Port of https://github.com/spacehuhn/esp8266_deauther to the ESP32,
 based on the `esp_wifi_80211_tx` function described in https://github.com/Jeija/esp32-80211-tx
 
 # Building
