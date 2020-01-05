@@ -35,6 +35,10 @@ void spam_task(void *pvParameter) {
     }
 }
 
+extern "C" int ieee80211_raw_frame_sanity_check(int32_t arg, int32_t arg2, int32_t arg3) {
+  return 0;
+}
+
 extern "C" void app_main(void) {
     nvs_flash_init();
     tcpip_adapter_init();
