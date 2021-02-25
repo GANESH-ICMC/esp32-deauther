@@ -3,6 +3,9 @@
 (Maybe) Port of https://github.com/spacehuhn/esp8266_deauther to the ESP32,
 based on the `esp_wifi_80211_tx` function described in https://github.com/Jeija/esp32-80211-tx
 
+# How does this work
+In compiled [ESP32 WiFi Stack libraries](https://github.com/espressif/esp32-wifi-lib) there is a function `ieee80211_raw_frame_sanity_check` that blocks some types of raw 802.11 frames from being sent. Using `zmuldefs` linker flag during compilation (see `main/CMakeLists.txt`) this function from WiFi Stack librabries can be overriden to always return `0` which leads to unrestricted raw frame transmission.
+
 # Building
 
 Install [esp-idf](https://github.com/espressif/esp-idf). This project is built and tested with
