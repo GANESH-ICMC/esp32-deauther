@@ -8,10 +8,10 @@ based on the `esp_wifi_80211_tx` function described in https://github.com/Jeija/
 Install [esp-idf](https://github.com/espressif/esp-idf). This project is built and tested with
 commit 5ef1b390026270503634ac3ec9f1ec2e364e23b2.
 
-`make` #Project has custom linker flags, run this instead of `idf.py build`
+Build project as usual using `idf.py build`.
 
 Built with v4.1-dev-763-ga45e99853
 
 # Flashing
 
-`make flash`
+`idf.py flash`
