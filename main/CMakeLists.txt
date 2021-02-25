@@ -5,3 +5,4 @@ idf_component_register(
     INCLUDE_DIRS
     "."
 )
+target_link_libraries(${COMPONENT_LIB} -Wl,-zmuldefs)
